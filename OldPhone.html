@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Background Clock</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Lora:wght@400&family=Montserrat:wght@400&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', Arial, sans-serif;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        .video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            padding-top: 26vh; /* Move content higher */
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 8px 20px rgba(0, 0, 0, 1);
+        }
+
+        #date {
+            font-size: 2.5rem;
+            font-family: "Fantasy", sans-serif;
+            font-weight: 400;
+            text-shadow: 5 15px 50px rgb(255, 0, 0);
+            text-align: center;
+            margin-bottom: 3px; /* Reduce space between date and time */
+        }
+
+        #flip-clock {
+            font-size: 6rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .interaction-prompt {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px 30px;
+            border-radius: 10px;
+            display: none;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Interaction Prompt -->
+    <div class="interaction-prompt" id="interactionPrompt">
+        Click anywhere to enable sound.
+    </div>
+
+    <!-- Video Background -->
+    <div class="video-container">
+        <iframe id="background-video" 
+            src="https://www.youtube.com/embed/kk1UKR0nJuY?autoplay=1&loop=1&playlist=kk1UKR0nJuY&controls=0&showinfo=0&rel=0&modestbranding=1&mute=1" 
+            allow="autoplay" allowfullscreen>
+        </iframe>
+    </div>
+
+    <!-- Flip Clock -->
+    <div class="clock-container">
+        <div id="date"></div>
+        <div id="flip-clock"></div>
+    </div>
+
+    <script>
+        // Update Clock and Date
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12; // Convert to 12-hour format
+            hours = String(hours).padStart(2, '0'); // Add leading zero if needed
+
+            const date = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+            });
+
+            document.getElementById('flip-clock').innerHTML = `${hours}:${minutes}:${seconds} ${ampm}`;
+            document.getElementById('date').innerHTML = date;
+        }
+
+        // Update the clock every second
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Handle user interaction to enable sound
+        function enableSound() {
+            const iframe = document.getElementById('background-video');
+            iframe.src = iframe.src.replace("&mute=1", ""); // Remove mute parameter to enable sound
+            document.getElementById('interactionPrompt').style.display = 'none'; // Hide the prompt
+            document.body.removeEventListener('click', enableSound); // Remove event listener
+        }
+
+        // Show interaction prompt and listen for user interaction
+        document.getElementById('interactionPrompt').style.display = 'block';
+        document.body.addEventListener('click', enableSound);
+    </script>
+</body>
+</html>
